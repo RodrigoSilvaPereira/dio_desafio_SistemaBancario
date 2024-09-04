@@ -34,13 +34,13 @@ O código é organizado da seguinte forma:
 2. **Navegue até o diretório do projeto:**
 
     ```bash
-    cd SeuRepositorio
+    cd dio_desafio_SistemaBancario
     ```
 
 3. **Execute o script principal:**
 
     ```bash
-    python seu_script.py
+    python main.py
     ```
 
 4. **Faça login:**
@@ -53,3 +53,36 @@ O código é organizado da seguinte forma:
 
 Ao iniciar o sistema e fazer login, você verá o seguinte menu:
 
+Bem-vindo ao sistema Bancário!!!
+
+Olá senhor admin! Por favor, digite a opção de sua escolha:
+
+1 - Depósito
+2 - Saque
+3 - Extrato
+0 - Sair
+
+- **Depósito:** Digite `1` e siga as instruções para adicionar fundos à conta.
+- **Saque:** Digite `2` para realizar um saque, respeitando os limites estabelecidos.
+- **Extrato:** Digite `3` para visualizar o saldo atual e o número de saques realizados.
+- **Sair:** Digite `0` para sair do sistema.
+
+## Limites do Sistema
+
+- **Limite de Saques Diários:** O usuário pode realizar até 3 saques por dia.
+- **Valor Máximo por Saque:** O valor máximo permitido para um saque é de R$ 500,00.
+
+## Contribuição
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests para melhorias ou novas funcionalidades.
+
+## Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE).
+
+## Contato
+
+Para mais informações ou dúvidas, entre em contato:
+
+- **Email:** 2005rodrigosilva@gmail.com
+- **GitHub:** [RodrigoSilvaPereira](https://github.com/RodrigoSilvaPereira)
