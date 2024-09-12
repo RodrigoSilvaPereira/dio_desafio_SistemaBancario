@@ -19,6 +19,7 @@ Olá senhor(a)! Por favor, digite a opção de sua escolha:
 """
 
 usuarios = {}  # Dicionário para armazenar contas de usuários
+numero_conta_corrente = 1  # Inicializa o número da primeira conta como 0001
 
 LIMITE_TRANSACOES = 10
 LIMITE_SAQUES = 3
@@ -27,10 +28,15 @@ MASCARA_BR = "%d/%m/%Y"
 DATA_HOJE = datetime.now().strftime(MASCARA_BR)
 DATA_ESTIMADA = (datetime.now() + timedelta(days=1)).strftime(MASCARA_BR)
 
-def criar_conta(usuario, senha):
+
+def criar_conta(usuario, senha, cpf, endereco, numero_conta):
+    """Cria uma conta com as informações fornecidas no cadastro."""
     return {
         "usuario": usuario,
         "senha": senha,
+        "cpf": cpf,
+        "endereco": endereco,
+        "numero_conta": numero_conta,
         "saldo": 0,
         "numero_saques": 0,
         "total_saque": 0,
@@ -49,15 +55,33 @@ def criar_conta(usuario, senha):
         }
     }
 
+
 def cadastrar():
+    """Realiza o cadastro de um novo usuário e cria uma conta corrente numerada."""
+    global numero_conta_corrente
+
+    print("=== Formulário de Cadastro ===")
     usuario = input("Digite o nome de usuário para cadastro: ")
     if usuario in usuarios:
         print("Usuário já cadastrado! Por favor, faça login.")
         iniciar_tela()
+        return
+
     senha = input("Digite a senha: ")
-    usuarios[usuario] = criar_conta(usuario, senha)
-    print("Usuário cadastrado com sucesso!\nFaça login para acessar sua conta.")
+    cpf = input("Digite o CPF: ")
+    endereco = input("Digite o endereço: ")
+
+    # Atribui o número da conta corrente formatado
+    numero_conta = f"{numero_conta_corrente:04d}"
+
+    # Cria a conta e armazena no dicionário de usuários
+    usuarios[usuario] = criar_conta(usuario, senha, cpf, endereco, numero_conta)
+
+    print(f"Usuário cadastrado com sucesso! Sua conta corrente é {numero_conta}.")
+    numero_conta_corrente += 1  # Incrementa o número da conta corrente para o próximo usuário
+
     iniciar_tela()
+
 
 def depositar(conta):
     if conta["total_transacoes"] < LIMITE_TRANSACOES:
@@ -76,6 +100,7 @@ def depositar(conta):
             depositar(conta)
     else:
         print(f'Você já realizou o seu limite de transações! Por favor, aguarde até {DATA_ESTIMADA}')
+
 
 def saque(conta):
     if conta["total_transacoes"] < LIMITE_TRANSACOES:
@@ -111,9 +136,13 @@ def saque(conta):
     else:
         print(f'Você já realizou o seu limite de transações! Por favor, aguarde até {DATA_ESTIMADA}')
 
+
 def extrato(conta):
     print(f"Informações da Conta:")
     print(f"Usuário: {conta['usuario']}")
+    print(f"Conta Corrente: {conta['numero_conta']}")
+    print(f"CPF: {conta['cpf']}")
+    print(f"Endereço: {conta['endereco']}")
     print(f"Saldo atual: {conta['saldo']:.2f} R$")
     print(f"Saques realizados: {conta['numero_saques']}")
     print(f"Total sacado: {conta['total_saque']:.2f} R$")
@@ -129,6 +158,7 @@ def extrato(conta):
     
     print("Obrigado por utilizar o sistema!\n")
     iniciar_sistema(conta)
+
 
 def iniciar_sistema(conta):
     opcao = input(tela_sistema)
@@ -146,6 +176,7 @@ def iniciar_sistema(conta):
             print("Opção não identificada!")
             iniciar_sistema(conta)
 
+
 def iniciar_tela():
     print(tela_inicio)
     opcao = input("Digite a sua escolha (1-Login, 2-Cadastro): ")
@@ -158,6 +189,7 @@ def iniciar_tela():
         print("Opção inválida!")
         iniciar_tela()
 
+
 def login():
     login_usuario = input("Digite o login do seu usuário: ")
     senha_usuario = input("Digite a senha do usuário: ")
@@ -168,5 +200,6 @@ def login():
     else:
         print("\nUsuário ou senha incorreto, por favor tente novamente!")
         iniciar_tela()
+
 
 iniciar_tela()
