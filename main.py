@@ -3,12 +3,14 @@ from datetime import datetime, timedelta
 tela_inicio = """
 Bem-vindo ao sistema Bancário!!!
 Aqui você poderá acessar informações sobre a sua conta!
-Primeiramente, realize o login!
+Primeiramente, realize o login ou faça o cadastro!
+1 - Login
+2 - Cadastro
 """
 
 tela_sistema = """
 Bem-vindo ao sistema Bancário!!!
-Olá senhor! Por favor, digite a opção de sua escolha:
+Olá senhor(a)! Por favor, digite a opção de sua escolha:
     
 1 - Depósito
 2 - Saque
@@ -16,26 +18,7 @@ Olá senhor! Por favor, digite a opção de sua escolha:
 0 - Sair
 """
 
-conta = {
-    "usuario": "admin",
-    "senha": "admin",
-    "saldo": 0,
-    "numero_saques": 0,
-    "total_saque": 0,
-    "numero_depositos": 0,
-    "total_deposito": 0,
-    "total_transacoes": 0,
-    "transacoes": {
-        "depositos": {
-            "data": [],
-            "valor": []
-        },
-        "saques": {
-            "data": [],
-            "valor": []
-        }
-    }
-}
+usuarios = {}  # Dicionário para armazenar contas de usuários
 
 LIMITE_TRANSACOES = 10
 LIMITE_SAQUES = 3
@@ -44,7 +27,39 @@ MASCARA_BR = "%d/%m/%Y"
 DATA_HOJE = datetime.now().strftime(MASCARA_BR)
 DATA_ESTIMADA = (datetime.now() + timedelta(days=1)).strftime(MASCARA_BR)
 
-def depositar():
+def criar_conta(usuario, senha):
+    return {
+        "usuario": usuario,
+        "senha": senha,
+        "saldo": 0,
+        "numero_saques": 0,
+        "total_saque": 0,
+        "numero_depositos": 0,
+        "total_deposito": 0,
+        "total_transacoes": 0,
+        "transacoes": {
+            "depositos": {
+                "data": [],
+                "valor": []
+            },
+            "saques": {
+                "data": [],
+                "valor": []
+            }
+        }
+    }
+
+def cadastrar():
+    usuario = input("Digite o nome de usuário para cadastro: ")
+    if usuario in usuarios:
+        print("Usuário já cadastrado! Por favor, faça login.")
+        iniciar_tela()
+    senha = input("Digite a senha: ")
+    usuarios[usuario] = criar_conta(usuario, senha)
+    print("Usuário cadastrado com sucesso!\nFaça login para acessar sua conta.")
+    iniciar_tela()
+
+def depositar(conta):
     if conta["total_transacoes"] < LIMITE_TRANSACOES:
         try:
             valor = float(input("Por favor, digite o valor que deseja inserir: "))
@@ -55,21 +70,21 @@ def depositar():
             conta["total_deposito"] += valor
             conta["transacoes"]["depositos"]["data"].append(DATA_HOJE)
             conta["transacoes"]["depositos"]["valor"].append(valor)
-            iniciar_sistema()
-
+            iniciar_sistema(conta)
         except ValueError:
             print("Valor inválido! Por favor, insira um número.")
-            depositar()
+            depositar(conta)
     else:
         print(f'Você já realizou o seu limite de transações! Por favor, aguarde até {DATA_ESTIMADA}')
 
-def saque():
+def saque(conta):
     if conta["total_transacoes"] < LIMITE_TRANSACOES:
         if conta["numero_saques"] < LIMITE_SAQUES:
             try:
                 valor = float(
                     input(
-                        f"O seu limite de saques atual é de {LIMITE_SAQUES - conta['numero_saques']}. Por favor, digite o valor que deseja sacar!\nLembre-se que o valor máximo para saque é de {LIMITE_VALOR_SAQUE}:\n"
+                        f"O seu limite de saques atual é de {LIMITE_SAQUES - conta['numero_saques']}. "
+                        f"Por favor, digite o valor que deseja sacar (máximo {LIMITE_VALOR_SAQUE}):\n"
                     )
                 )
                 if valor <= LIMITE_VALOR_SAQUE:
@@ -83,61 +98,73 @@ def saque():
                         conta["transacoes"]["saques"]["valor"].append(valor)
                     else:
                         print("Saldo insuficiente!")
-                    iniciar_sistema()
+                    iniciar_sistema(conta)
                 else:
                     print(f"O valor máximo para saque é de {LIMITE_VALOR_SAQUE}")
-                    saque()
+                    saque(conta)
             except ValueError:
                 print("Valor inválido! Por favor, insira um número!")
-                saque()
+                saque(conta)
         else:
             print("Você já realizou o seu limite de saques! Por favor, aguarde até amanhã!")
-            iniciar_sistema()
+            iniciar_sistema(conta)
     else:
         print(f'Você já realizou o seu limite de transações! Por favor, aguarde até {DATA_ESTIMADA}')
 
-def extrato():
-    print(f"Seu saldo atual é de: {conta['saldo']:.2f} R$!\n")
-    print(f"Você já realizou um total de {conta['numero_saques']} operações de saque!\n")
-    print(f"Você sacou um total de {conta['total_saque']:.2f} R$!\n")
-    print(f"Você realizou de {conta['numero_depositos']} operações de depósito!\n")
-    print(f"Você depositou um total de {conta['total_deposito']:.2f} R$!\n")
-    print(f"Você realizou um total de {conta['total_transacoes']} transações!\n")
-    print(f"Histórico de Extratos: \n")
-    
+def extrato(conta):
+    print(f"Informações da Conta:")
+    print(f"Usuário: {conta['usuario']}")
+    print(f"Saldo atual: {conta['saldo']:.2f} R$")
+    print(f"Saques realizados: {conta['numero_saques']}")
+    print(f"Total sacado: {conta['total_saque']:.2f} R$")
+    print(f"Depósitos realizados: {conta['numero_depositos']}")
+    print(f"Total depositado: {conta['total_deposito']:.2f} R$")
+    print(f"Total de transações: {conta['total_transacoes']}\n")
+
+    print("Histórico de Transações:")
     for tipo, detalhes in conta["transacoes"].items():
         print(f"{tipo.capitalize()}:")
         for data, valor in zip(detalhes["data"], detalhes["valor"]):
-            print(f"{data}: {valor:.2f}")
+            print(f"{data}: {valor:.2f} R$")
     
-    print("Obrigado por utilizar meu sistema!\n")
-    iniciar_sistema()
+    print("Obrigado por utilizar o sistema!\n")
+    iniciar_sistema(conta)
 
-def iniciar_sistema():
+def iniciar_sistema(conta):
     opcao = input(tela_sistema)
 
     match opcao:
         case "1":
-            depositar()
+            depositar(conta)
         case "2":
-            saque()
+            saque(conta)
         case "3":
-            extrato()
+            extrato(conta)
         case "0":
             exit()
         case _:
-            print("Alternativa não identificada!")
-            iniciar_sistema()
+            print("Opção não identificada!")
+            iniciar_sistema(conta)
 
 def iniciar_tela():
     print(tela_inicio)
+    opcao = input("Digite a sua escolha (1-Login, 2-Cadastro): ")
 
+    if opcao == "1":
+        login()
+    elif opcao == "2":
+        cadastrar()
+    else:
+        print("Opção inválida!")
+        iniciar_tela()
+
+def login():
     login_usuario = input("Digite o login do seu usuário: ")
     senha_usuario = input("Digite a senha do usuário: ")
 
-    if login_usuario == conta["usuario"] and senha_usuario == conta["senha"]:
+    if login_usuario in usuarios and senha_usuario == usuarios[login_usuario]["senha"]:
         print("\nBem-Vindo ao sistema!! É um prazer estar de volta!")
-        iniciar_sistema()
+        iniciar_sistema(usuarios[login_usuario])
     else:
         print("\nUsuário ou senha incorreto, por favor tente novamente!")
         iniciar_tela()
