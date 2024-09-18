@@ -112,7 +112,7 @@ Função principal que executa o menu e interage com o usuário.
 2. Execute o script com Python 3.
 
 ```bash
-python seu_script.py
+python main.py
 ```
 
 ## Dependencias
